@@ -1,0 +1,13 @@
+plugins {
+    id "org.jetbrains.kotlin.jvm" version "1.1.2-5"
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    testCompile "org.testng:testng:6.8+"
+    testCompile "org.assertj:assertj-core:3.8.0"
+    compile "org.jetbrains.kotlin:kotlin-stdlib-jre8:1.1.2-5"
+}
