@@ -3,6 +3,7 @@ package com.github.nskvortsov.maze
 import com.github.nskvortsov.maze.Direction.*
 import com.github.nskvortsov.maze.MazeNodeContent.Companion.EMPTY
 import com.github.nskvortsov.maze.MazeNodeContent.Companion.EXIT
+import com.github.nskvortsov.maze.MazeNodeContent.Companion.TREASURE
 
 // Maze with default exit location on top right corner
 class Maze(val size: Int, val exit: Pair<Int, Int> = Pair(0, size)) {
@@ -54,6 +55,15 @@ class Maze(val size: Int, val exit: Pair<Int, Int> = Pair(0, size)) {
     operator fun set(x: Int, y: Int, newNode: MazeNode) = set(Pair(x, y), newNode)
     operator fun set(position: Pair<Int, Int>, newNode: MazeNode) {
         nodes[position.first][position.second] = newNode
+    }
+
+    fun  putTreasure(x: Int, y: Int): Boolean {
+        val node = get(x, y)
+        if (node.content == EMPTY) {
+            set(x, y, node.copy(TREASURE))
+            return true
+        }
+        return false
     }
 }
 
