@@ -60,6 +60,14 @@ class MazeTest {
         m[Pair(1,1)] = m[Pair(1,1)].copy(TREASURE)
         then(m[Pair(1,1)]).hasTreasure()
     }
+
+
+    fun testExitIsValidated() {
+        val m = Maze(2, Pair(0,2))
+        then(m.exit).isEqualTo(Pair(0, 2))
+        thenThrownBy { Maze(2, Pair(0, 0)) }
+                .isInstanceOf(IllegalArgumentException::class.java)
+    }
 }
 
 @Test
@@ -101,13 +109,6 @@ class PlayerTest {
                 .isInstanceOf(IllegalArgumentException::class.java)
 
         thenThrownBy { Player(Maze(2), Pair(-1, -1)) }
-                .isInstanceOf(IllegalArgumentException::class.java)
-    }
-
-    fun testExitIsValidated() {
-        val m = Maze(2, Pair(0,2))
-        then(m.exit).isEqualTo(Pair(0, 2))
-        thenThrownBy { Maze(2, Pair(0, 0)) }
                 .isInstanceOf(IllegalArgumentException::class.java)
     }
 
