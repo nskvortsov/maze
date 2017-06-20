@@ -2,6 +2,7 @@ package com.github.nskvortsov.maze
 
 import com.github.nskvortsov.maze.Direction.*
 import com.github.nskvortsov.maze.MazeAssertions.then
+import com.github.nskvortsov.maze.MazeNodeContent.Companion.SWAMP
 import com.github.nskvortsov.maze.MazeNodeContent.Companion.TREASURE
 import com.github.nskvortsov.maze.Result.*
 import org.assertj.core.api.BDDAssertions.then
@@ -170,6 +171,14 @@ class PlayerTest {
         then(p.tryToMove(DOWN)).isEqualTo(HIT_THE_WALL)
         then(p.tryToMove(LEFT)).isEqualTo(HIT_THE_WALL)
         then(p.tryToMove(UP)).isEqualTo(OK)
+    }
+
+    fun testSwamp() {
+        val m = Maze(2)
+        m[0, 1] = m[0, 1].copy(SWAMP)
+        val p = Player(m)
+
+        then(p.tryToMove(RIGHT)).isEqualTo(STUCK_IN_SWAMP)
     }
 }
 

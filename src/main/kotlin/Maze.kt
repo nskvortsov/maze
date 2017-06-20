@@ -3,6 +3,7 @@ package com.github.nskvortsov.maze
 import com.github.nskvortsov.maze.Direction.*
 import com.github.nskvortsov.maze.MazeNodeContent.Companion.EMPTY
 import com.github.nskvortsov.maze.MazeNodeContent.Companion.EXIT
+import com.github.nskvortsov.maze.MazeNodeContent.Companion.SWAMP
 import com.github.nskvortsov.maze.MazeNodeContent.Companion.TREASURE
 
 // Maze with default exit location on top right corner
@@ -44,6 +45,7 @@ class Maze(val size: Int, val exit: Pair<Int, Int> = Pair(0, size)) {
         return MazeNode(EXIT, true, true, true, true).removeWallAt(exitDirection)
     }
 
+    operator fun get(x: Int, y: Int) = get(Pair(x, y))
     operator fun get(position: Pair<Int, Int>): MazeNode {
         if (position == exit) {
             return exitNode
@@ -51,6 +53,7 @@ class Maze(val size: Int, val exit: Pair<Int, Int> = Pair(0, size)) {
         return nodes[position.first][position.second]
     }
 
+    operator fun set(x: Int, y: Int, newNode: MazeNode) = set(Pair(x, y), newNode)
     operator fun set(position: Pair<Int, Int>, newNode: MazeNode) {
         nodes[position.first][position.second] = newNode
     }
@@ -116,11 +119,12 @@ class MazeNodeContent(val allowsSpawn:Boolean = false) {
         val TREASURE = MazeNodeContent()
         val EMPTY = MazeNodeContent(true)
         val EXIT = MazeNodeContent()
+        val SWAMP = MazeNodeContent()
     }
 }
 
 enum class Result {
-    HIT_THE_WALL, OK, FOUND_TREASURE, FOUND_EXIT, VICTORY
+    HIT_THE_WALL, OK, FOUND_TREASURE, FOUND_EXIT, VICTORY, STUCK_IN_SWAMP
 }
 
 class Player(val maze: Maze, var position: Pair<Int, Int> = Pair(0, 0)) {
@@ -158,6 +162,7 @@ class Player(val maze: Maze, var position: Pair<Int, Int> = Pair(0, 0)) {
                         return Result.FOUND_EXIT
                     }
                 }
+                newContent == SWAMP -> { position = newPosition; Result.STUCK_IN_SWAMP }
                 else -> { position = newPosition; Result.OK }
             }
         }
