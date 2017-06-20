@@ -30,8 +30,7 @@ class Player(val maze: Maze, var position: Pair<Int, Int> = Pair(0, 0), val name
             val newContent = maze[newPosition].content
             return when {
                 node.hasWall(direction = direction) -> Result.HIT_THE_WALL
-                newContent == MazeNodeContent.TREASURE -> { position = newPosition; hasTreasure = true; Result.FOUND_TREASURE
-                }
+                newContent == MazeNodeContent.TREASURE -> { position = newPosition; hasTreasure = true; Result.FOUND_TREASURE }
                 newContent == MazeNodeContent.EXIT -> {
                     position = newPosition
                     if (hasTreasure) {
@@ -40,10 +39,8 @@ class Player(val maze: Maze, var position: Pair<Int, Int> = Pair(0, 0), val name
                         return Result.FOUND_EXIT
                     }
                 }
-                newContent == MazeNodeContent.SWAMP -> { position = newPosition; Result.STUCK_IN_SWAMP
-                }
-                else -> { position = newPosition; Result.OK
-                }
+                newContent == MazeNodeContent.SWAMP -> { position = newPosition; Result.STUCK_IN_SWAMP }
+                else -> { position = newPosition; Result.OK }
             }
         }
     }
