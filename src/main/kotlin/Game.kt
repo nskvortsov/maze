@@ -9,6 +9,9 @@ import java.util.*
 class Game(val maze: Maze, player1Name: String, player2Name: String, vararg otherPlayers: String) {
     val playerNames = listOf(player1Name, player2Name) + otherPlayers
     val stuckPlayers = hashSetOf<Player>()
+    var winner: Player? = null
+        set(value) { if (field == null) { field = value } }
+
     lateinit var players: List<Player>
     lateinit var currentPlayer: Player
     var state: GameState = GameState.NEW
@@ -36,6 +39,9 @@ class Game(val maze: Maze, player1Name: String, player2Name: String, vararg othe
         val result = currentPlayer.tryToMove(direction)
         if (result == Result.STUCK_IN_SWAMP) {
             stuckPlayers.add(currentPlayer)
+        }
+        if (result == Result.VICTORY) {
+            winner = currentPlayer
         }
         if (result != Result.HIT_THE_WALL) {
             currentPlayer = currentPlayer.nextPlayer()

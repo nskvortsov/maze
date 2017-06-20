@@ -47,6 +47,20 @@ class GameAssert(actual: Game): AbstractAssert<GameAssert, Game>(actual, GameAss
         return this
     }
 
+    fun winner(player: Player?): GameAssert {
+        if (player != actual.winner) {
+            failWithMessage("Wrong winner. Expected ${player?.name ?: "no one"} but was ${actual.winner?.name ?: "no one"}")
+        }
+        return this
+    }
+
+    fun winner(playerName: String?): GameAssert {
+        if (playerName != actual.winner?.name) {
+            failWithMessage("Wrong winner. Expected ${playerName ?: "no one"} but was ${actual.winner?.name ?: "no one"}")
+        }
+        return this
+    }
+
 }
 
 class MazeNodeAssert(actual: MazeNode): AbstractAssert<MazeNodeAssert, MazeNode>(actual, MazeNodeAssert::class.java) {

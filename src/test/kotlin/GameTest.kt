@@ -106,4 +106,31 @@ class GameTest {
             current(g.players[1])
         }
     }
+
+    fun testVictory() {
+        val maze = Maze(2)
+        maze.putTreasure(0,1)
+        val g = Game(maze, "p1", "p2").start()
+
+        // for test
+        g.players.forEach { it.position = Pair(0, 0) }
+
+        with(scenario(g)) {
+            winner(null as Player?)
+
+            move(RIGHT)
+            result(FOUND_TREASURE)
+
+            move(RIGHT)
+            result(FOUND_TREASURE)
+
+            move(RIGHT)
+            result(VICTORY)
+            winner("p1")
+
+            move(RIGHT)
+            result(VICTORY)
+            winner("p1")
+        }
+    }
 }
