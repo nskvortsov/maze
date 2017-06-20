@@ -72,4 +72,38 @@ class GameTest {
             current(secondPlayer)
         }
     }
+
+    fun testSwamp() {
+        val maze = Maze(2)
+        maze.putTreasure(1, 1)
+        maze[1, 0] = maze[1, 0].copy(MazeNodeContent.SWAMP)
+
+        val g = Game(maze, "p1", "p2", "p3").start()
+
+        // for test
+        g.players.forEach { it.position = Pair(0, 0) }
+
+        with(scenario(g)) {
+            move(DOWN)
+            result(STUCK_IN_SWAMP)
+
+            current(g.players[1])
+            move(DOWN)
+            result(STUCK_IN_SWAMP)
+
+            current(g.players[2])
+            move(RIGHT)
+            result(OK)
+
+            current(g.players[2])
+            move(RIGHT)
+            result(FOUND_EXIT)
+
+            current(g.players[0])
+            move(RIGHT)
+            result(FOUND_TREASURE)
+
+            current(g.players[1])
+        }
+    }
 }
