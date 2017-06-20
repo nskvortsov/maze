@@ -13,7 +13,7 @@ class MazeTest {
     fun testOneBlockEmptyMaze() {
         val m: Maze = Maze(1)
 
-        val node: MazeNode = m[0,0]
+        val node: MazeNode = m[Pair(0,0)]
 
         then(node)
                 .isEmpty()
@@ -26,28 +26,28 @@ class MazeTest {
     fun testFourBlockEmptyMaze() {
         val m = Maze(2)
 
-        then(m[0,0])
+        then(m[Pair(0,0)])
                 .isEmpty()
                 .wall(UP)
                 .wall(LEFT)
                 .noWall(RIGHT)
                 .noWall(DOWN)
 
-        then(m[0,1])
+        then(m[Pair(0,1)])
                 .isEmpty()
                 .wall(UP)
                 .noWall(LEFT)
                 .noWall(RIGHT) // exit is here
                 .noWall(DOWN)
 
-        then(m[1,0])
+        then(m[Pair(1,0)])
                 .isEmpty()
                 .noWall(UP)
                 .wall(LEFT)
                 .noWall(RIGHT)
                 .wall(DOWN)
 
-        then(m[1,1])
+        then(m[Pair(1,1)])
                 .isEmpty()
                 .noWall(UP)
                 .noWall(LEFT)
@@ -57,8 +57,8 @@ class MazeTest {
 
     fun addATreasureToMaze() {
         val m = Maze(2)
-        m[1,1] = m[1,1].copy(TREASURE)
-        then(m[1,1]).hasTreasure()
+        m[Pair(1,1)] = m[Pair(1,1)].copy(TREASURE)
+        then(m[Pair(1,1)]).hasTreasure()
     }
 }
 
@@ -83,7 +83,7 @@ class PlayerTest {
 
     fun testCanNotSpawnOnTreasure() {
         val m = Maze(2)
-        m[1,1] = m[1,1].copy(TREASURE)
+        m[Pair(1,1)] = m[Pair(1,1)].copy(TREASURE)
 
         thenThrownBy { Player(m, Pair(1, 1)) }
                 .isInstanceOf(IllegalArgumentException::class.java)
@@ -113,7 +113,7 @@ class PlayerTest {
 
     fun testVictoryWalk() {
         val m = Maze(2, Pair(0,2))
-        m[0,1] = m[0,1].copy(TREASURE)
+        m[Pair(0,1)] = m[Pair(0,1)].copy(TREASURE)
 
         val p = Player(m, Pair(0, 0))
 

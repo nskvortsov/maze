@@ -42,19 +42,11 @@ class Maze(val size: Int, val exit: Pair<Int, Int> = Pair(0, size)) {
         return MazeNode(EXIT, true, true, true, true).removeWallAt(exitDirection)
     }
 
-    operator fun get(row: Int, column: Int): MazeNode {
-        return nodes[row][column]
-    }
-
     operator fun get(position: Pair<Int, Int>): MazeNode {
         if (position == exit) {
             return exitNode
         }
         return nodes[position.first][position.second]
-    }
-
-    operator fun set(row: Int, column: Int, newNode: MazeNode) {
-        nodes[row][column] = newNode
     }
 
     operator fun set(position: Pair<Int, Int>, newNode: MazeNode) {
