@@ -4,6 +4,7 @@ import com.github.nskvortsov.maze.Direction.*
 import com.github.nskvortsov.maze.MazeAssertions.then
 import com.github.nskvortsov.maze.MazeNodeContent.TREASURE
 import org.assertj.core.api.BDDAssertions.then
+import org.assertj.core.api.BDDAssertions.thenThrownBy
 import org.testng.annotations.Test
 
 @Test
@@ -67,21 +68,60 @@ class PlayerTest {
         then(p.tryToMove(UP)).isEqualTo(Result.HIT_THE_WALL)
         then(p.tryToMove(DOWN)).isEqualTo(Result.HIT_THE_WALL)
         then(p.tryToMove(LEFT)).isEqualTo(Result.HIT_THE_WALL)
-        then(p.tryToMove(RIGHT)).isEqualTo(Result.HIT_THE_WALL)
+        then(p.tryToMove(RIGHT)).isEqualTo(Result.FOUND_EXIT)
     }
 
     fun testSmallMazeWalk() {
-        val p = Player(Maze(3), row = 1, column = 1)
+        val p = Player(Maze(3), Pair(1, 1))
 
-        then(p.row).isEqualTo(1)
-        then(p.column).isEqualTo(1)
-
+        then(p.position).isEqualTo(Pair(1, 1))
         then(p.tryToMove(RIGHT)).isEqualTo(Result.OK)
-
-        then(p.row).isEqualTo(1)
-        then(p.column).isEqualTo(2)
-
+        then(p.position).isEqualTo(Pair(1, 2))
         then(p.tryToMove(RIGHT)).isEqualTo(Result.HIT_THE_WALL)
+    }
+
+    fun testCanNotSpawnOnTreasure() {
+        val m = Maze(2)
+        m[1,1] = m[1,1].copy(TREASURE)
+
+        thenThrownBy { Player(m, Pair(1, 1)) }
+                .isInstanceOf(IllegalArgumentException::class.java)
+                .withFailMessage("Can not spawn a player over a non-empty place")
+    }
+
+    fun testCanNotSpawnOutside() {
+        thenThrownBy { Player(Maze(2), Pair(2, 2)) }
+                .isInstanceOf(IllegalArgumentException::class.java)
+
+        thenThrownBy { Player(Maze(2), Pair(2, 0)) }
+                .isInstanceOf(IllegalArgumentException::class.java)
+
+        thenThrownBy { Player(Maze(2), Pair(0, 2)) }
+                .isInstanceOf(IllegalArgumentException::class.java)
+
+        thenThrownBy { Player(Maze(2), Pair(-1, -1)) }
+                .isInstanceOf(IllegalArgumentException::class.java)
+    }
+
+    fun testExitIsValidated() {
+        val m = Maze(2, Pair(0,2))
+        then(m.exit).isEqualTo(Pair(0, 2))
+        thenThrownBy { Maze(2, Pair(0, 0)) }
+                .isInstanceOf(IllegalArgumentException::class.java)
+    }
+
+    fun testVictoryWalk() {
+        val m = Maze(2, Pair(0,2))
+        m[0,1] = m[0,1].copy(TREASURE)
+
+        val p = Player(m, Pair(0, 0))
+
+        then(p.hasTreasure).isFalse()
+        then(p.tryToMove(RIGHT)).isEqualTo(Result.FOUND_TREASURE)
+        then(p.hasTreasure).isTrue()
+
+        then(p.tryToMove(UP)).isEqualTo(Result.HIT_THE_WALL)
+        then(p.tryToMove(RIGHT)).isEqualTo(Result.VICTORY)
     }
 }
 
