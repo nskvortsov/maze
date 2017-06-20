@@ -12,6 +12,43 @@ object MazeAssertions {
     }
 }
 
+object GameAssertions {
+    fun scenario(actual: Game): GameAssert {
+        return GameAssert(actual)
+    }
+}
+
+class GameAssert(actual: Game): AbstractAssert<GameAssert, Game>(actual, GameAssert::class.java) {
+    lateinit var lastResult: Result
+
+    fun isRunning(): GameAssert {
+        if (actual.state != GameState.RUNNING) {
+            failWithMessage("Expecting game to be running")
+        }
+        return this
+    }
+
+    fun move(direction: Direction): GameAssert {
+        lastResult = actual.tryMove(direction)
+        return this
+    }
+
+    fun result(expected: Result): GameAssert {
+        if (lastResult != expected) {
+            failWithMessage("Wrong last result state. Expected $expected, but was $lastResult")
+        }
+        return this
+    }
+
+    fun current(player: Player): GameAssert {
+        if (actual.currentPlayer != player) {
+            failWithMessage("Wrong current player. Expected ${player.name}, but was ${actual.currentPlayer.name}")
+        }
+        return this
+    }
+
+}
+
 class MazeNodeAssert(actual: MazeNode): AbstractAssert<MazeNodeAssert, MazeNode>(actual, MazeNodeAssert::class.java) {
     fun isEmpty(): MazeNodeAssert {
         if (actual.content != MazeNodeContent.EMPTY) {

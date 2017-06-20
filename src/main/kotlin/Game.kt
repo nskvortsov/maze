@@ -9,6 +9,10 @@ import java.util.*
 class Game(val maze: Maze, player1Name: String, player2Name: String, vararg otherPlayers: String) {
     val playerNames = listOf(player1Name, player2Name) + otherPlayers
     lateinit var players: List<Player>
+    lateinit var currentPlayer: Player
+    var state: GameState = GameState.NEW
+        private set(value) { field = value }
+
     fun start(): Game {
         val r = Random()
         players = playerNames.map { name ->
@@ -18,6 +22,7 @@ class Game(val maze: Maze, player1Name: String, player2Name: String, vararg othe
             } while (maze[spawnPos].content != MazeNodeContent.EMPTY)
             Player(maze, spawnPos, name)
         }
+        currentPlayer = players[0]
         state = GameState.RUNNING
         return this
     }
@@ -26,8 +31,17 @@ class Game(val maze: Maze, player1Name: String, player2Name: String, vararg othe
         state = GameState.STOPPED
     }
 
-    var state: GameState = GameState.NEW
-        private set(value) { field = value }
+    fun tryMove(direction: Direction): Result {
+        val result = currentPlayer.tryToMove(direction)
+        if (result != Result.HIT_THE_WALL) {
+            currentPlayer = currentPlayer.nextPlayer()
+        }
+        return result
+    }
+
+    fun Player.nextPlayer(): Player {
+        return players[(players.indexOf(this) + 1) % players.size]
+    }
 }
 
 enum class GameState {
