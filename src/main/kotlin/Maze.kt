@@ -20,9 +20,27 @@ class Maze(val size: Int, val exit: Pair<Int, Int> = Pair(0, size)) {
         if ((exit.first !in allowed) && (exit.second !in allowed)) {
             throw IllegalArgumentException("Illegal exit coordinates $exit. One coordinates should be one of $allowed")
         }
+
+        val corners = listOf<Pair<Int, Int>>(Pair(-1, -1), Pair(-1, size), Pair(size, -1), Pair(size, size))
+        if (exit in corners) {
+            throw IllegalArgumentException("Illegal exit coordinates $exit. Exit must not be in a corner")
+        }
     }
 
-    val exitNode = MazeNode(EXIT)
+    val exitNode = createAndConnectExitNode()
+
+    fun createAndConnectExitNode(): MazeNode {
+        val exitDirection = when {
+            exit.first == -1     -> Direction.DOWN
+            exit.first == size   -> Direction.UP
+            exit.second == -1    -> Direction.RIGHT
+            exit.second == size  -> Direction.LEFT
+            else -> throw IllegalStateException("Hey something is very wrong with the exit! it is at $exit")
+        }
+
+        this[exitDirection(exit)] = this[exitDirection(exit)].removeWallAt(exitDirection.reverse())
+        return MazeNode(EXIT, true, true, true, true).removeWallAt(exitDirection)
+    }
 
     operator fun get(row: Int, column: Int): MazeNode {
         return nodes[row][column]
@@ -62,11 +80,21 @@ open class MazeNode(val content: MazeNodeContent = EMPTY,
     }
 
     fun copy( content: MazeNodeContent = this.content,
-              topWall: Boolean = this.walls[UP]!!,
-              bottomWall: Boolean = this.walls[DOWN]!!,
-              leftWall: Boolean = this.walls[LEFT]!!,
-              rightWall: Boolean = this.walls[RIGHT]!!): MazeNode {
+              topWall: Boolean = walls[UP]!!,
+              bottomWall: Boolean = walls[DOWN]!!,
+              leftWall: Boolean = walls[LEFT]!!,
+              rightWall: Boolean = walls[RIGHT]!!): MazeNode {
         return MazeNode(content, topWall, bottomWall, leftWall, rightWall)
+    }
+
+    fun  removeWallAt(dir: Direction): MazeNode {
+        val copyWalls = walls.toMutableMap()
+        copyWalls[dir] = false
+        return MazeNode(content,
+                topWall = copyWalls[UP]!!,
+                bottomWall = copyWalls[DOWN]!!,
+                leftWall = copyWalls[LEFT]!!,
+                rightWall = copyWalls[RIGHT]!!)
     }
 }
 
@@ -80,6 +108,13 @@ enum class Direction {
                 LEFT  -> Pair(position.first, position.second - 1)
                 RIGHT -> Pair(position.first, position.second + 1)
             }
+
+    fun reverse() = when (this) {
+        UP    -> DOWN
+        DOWN  -> UP
+        LEFT  -> RIGHT
+        RIGHT -> LEFT
+    }
 }
 
 enum class MazeNodeContent {
@@ -110,7 +145,7 @@ class Player(val maze: Maze, var position: Pair<Int, Int> = Pair(0, 0)) {
         val node = maze[position]
         val newPosition = direction(position)
         return when {
-            node.hasWall(direction = direction) && newPosition != maze.exit -> Result.HIT_THE_WALL
+            node.hasWall(direction = direction) -> Result.HIT_THE_WALL
             maze[newPosition].content == TREASURE -> { position = newPosition; hasTreasure = true; Result.FOUND_TREASURE }
             maze[newPosition].content == MazeNodeContent.EXIT -> {
                 position = newPosition
