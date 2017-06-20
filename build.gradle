@@ -4,7 +4,12 @@ plugins {
 
 repositories {
     mavenCentral()
+    mavenLocal()
 }
+apply plugin: "maven"
+
+group = "com.github.nskvortsov.maze"
+version = "0.1"
 
 dependencies {
     testCompile "org.testng:testng:6.8+"
