@@ -1,5 +1,8 @@
 package com.github.nskvortsov.maze
 
+import com.github.nskvortsov.maze.MazeAssertions.then
+import org.assertj.core.api.BDDAssertions.then
+import org.assertj.core.api.BDDAssertions.thenThrownBy
 import org.testng.annotations.Test
 
 @Test
