@@ -2,7 +2,7 @@ package com.github.nskvortsov.maze
 
 import com.github.nskvortsov.maze.Direction.*
 import com.github.nskvortsov.maze.MazeAssertions.then
-import com.github.nskvortsov.maze.MazeNodeContent.TREASURE
+import com.github.nskvortsov.maze.MazeNodeContent.Companion.TREASURE
 import com.github.nskvortsov.maze.Result.*
 import org.assertj.core.api.BDDAssertions.then
 import org.assertj.core.api.BDDAssertions.thenThrownBy

@@ -1,7 +1,9 @@
 package com.github.nskvortsov.maze
 
 import com.github.nskvortsov.maze.Direction.*
-import com.github.nskvortsov.maze.MazeNodeContent.*
+import com.github.nskvortsov.maze.MazeNodeContent.Companion.EMPTY
+import com.github.nskvortsov.maze.MazeNodeContent.Companion.EXIT
+import com.github.nskvortsov.maze.MazeNodeContent.Companion.TREASURE
 
 // Maze with default exit location on top right corner
 class Maze(val size: Int, val exit: Pair<Int, Int> = Pair(0, size)) {
@@ -109,8 +111,12 @@ enum class Direction {
     }
 }
 
-enum class MazeNodeContent {
-    EMPTY, TREASURE, EXIT
+class MazeNodeContent(val allowsSpawn:Boolean = false) {
+    companion object {
+        val TREASURE = MazeNodeContent()
+        val EMPTY = MazeNodeContent(true)
+        val EXIT = MazeNodeContent()
+    }
 }
 
 enum class Result {
@@ -124,7 +130,7 @@ class Player(val maze: Maze, var position: Pair<Int, Int> = Pair(0, 0)) {
             throw IllegalArgumentException("Can not spawn outside of the maze")
         }
 
-        if (maze[position].content != MazeNodeContent.EMPTY) {
+        if (!maze[position].content.allowsSpawn) {
             throw IllegalArgumentException("Can not spawn a player over a non-empty place")
         }
     }
@@ -136,18 +142,33 @@ class Player(val maze: Maze, var position: Pair<Int, Int> = Pair(0, 0)) {
     fun tryToMove(direction: Direction): Result {
         val node = maze[position]
         val newPosition = direction(position)
-        return when {
-            node.hasWall(direction = direction) -> Result.HIT_THE_WALL
-            maze[newPosition].content == TREASURE -> { position = newPosition; hasTreasure = true; Result.FOUND_TREASURE }
-            maze[newPosition].content == MazeNodeContent.EXIT -> {
-                position = newPosition
-                if (hasTreasure) {
-                    return Result.VICTORY
-                } else {
-                    return Result.FOUND_EXIT
+
+        if (!newPosition.isInside(maze)) {
+            return Result.HIT_THE_WALL
+        } else {
+            val newContent = maze[newPosition].content
+            return when {
+                node.hasWall(direction = direction) -> Result.HIT_THE_WALL
+                newContent == TREASURE -> { position = newPosition; hasTreasure = true; Result.FOUND_TREASURE }
+                newContent == EXIT -> {
+                    position = newPosition
+                    if (hasTreasure) {
+                        return Result.VICTORY
+                    } else {
+                        return Result.FOUND_EXIT
+                    }
                 }
+                else -> { position = newPosition; Result.OK }
             }
-            else -> { position = newPosition; Result.OK }
         }
+    }
+}
+
+private fun Pair<Int, Int>.isInside(maze: Maze): Boolean {
+    if (maze.exit == this) {
+        return true
+    } else {
+        val allowed = 0..(maze.size - 1)
+        return first in allowed && second in allowed
     }
 }
